@@ -36,13 +36,17 @@ public class CamTest extends LinearOpMode {
             }
         });
 
-        camera.setPipeline(new MaskUnsaturatedPipeline());
+        TeamPropDetectPipeline pipe = new TeamPropDetectPipeline();
+
+        camera.setPipeline(pipe);
 
         waitForStart();
 
         while (opModeIsActive())
         {
             telemetry.addData("Status", "Running");
+            telemetry.addData("Position", pipe.getPos());
+            telemetry.addLine(pipe.getStringPos());
             telemetry.update();
         }
     }
