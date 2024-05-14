@@ -130,9 +130,11 @@ public class TeamPropDetectPipeline extends OpenCvPipeline {
 
 
         if (getPos() == -1) {
-            return " ---O---\n" +
+            return " -------O-------\n" +
+                    "|        |" +
                     "|        |\n" +
                     "X        O\n" +
+                    "|        |\n" +
                     "|        |";
         }
         else if (getPos() == 0)

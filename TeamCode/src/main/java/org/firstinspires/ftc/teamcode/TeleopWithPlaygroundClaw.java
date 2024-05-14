@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,9 +17,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class TeleopWithPlaygroundClaw extends LinearOpMode {
 
+
+    private final double ARM_DOWN = 0.30;
+    private final double ARM_OUT = 0;//0.025
+    private final double ARM_TUCKED = .45;
     private Servo lcs = null;
     private Servo rcs = null;
     private Servo ars = null;
+    private CRServo intake = null;
     private DcMotor lift = null;
     private Claw lc;
     private Claw rc;
@@ -41,6 +47,8 @@ public class TeleopWithPlaygroundClaw extends LinearOpMode {
         lcs = hardwareMap.get(Servo.class, "left claw");
         rcs = hardwareMap.get(Servo.class, "right claw");
         ars = hardwareMap.get(Servo.class, "arm rotate");
+        intake = hardwareMap.get(CRServo.class, "intake");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         lift = hardwareMap.get(DcMotor.class, "lift");
 
         leftFront = hardwareMap.get(DcMotor.class, "leftfront");
@@ -66,10 +74,11 @@ public class TeleopWithPlaygroundClaw extends LinearOpMode {
 
         lift.setDirection(DcMotor.Direction.REVERSE);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         lc = new Claw(lcs, .25, 1);
         rc = new Claw(rcs, .75, 0);
-        ar = new Claw(ars, 0.025, .35);
+        //ar = new Claw(ars, .30, 0.025);
         waitForStart();
 
         while (opModeIsActive())
@@ -85,13 +94,17 @@ public class TeleopWithPlaygroundClaw extends LinearOpMode {
                 lc.close();
             }
 
-            if (lift.getCurrentPosition() > 200)
+            if (lift.getCurrentPosition() > 650)
             {
-                ar.open();
+                ars.setPosition(ARM_OUT);
             }
+            /*else if (lift.getCurrentPosition() > 160)
+            {
+                ars.setPosition(ARM_TUCKED);
+            }*/
             else
             {
-                ar.close();
+                ars.setPosition(ARM_DOWN);
             }
 
             if (gamepad1.dpad_up)
@@ -112,6 +125,16 @@ public class TeleopWithPlaygroundClaw extends LinearOpMode {
                 //lift.setPower(1);
                 lift.setPower(0);
             }
+
+            if(gamepad1.x)
+            {
+                intake.setPower(1);
+            }
+            else
+            {
+                intake.setPower(0);
+            }
+
             telemetry.addData("LiftPosition", lift.getCurrentPosition());
             telemetry.update();
 
